@@ -1,0 +1,11 @@
+{
+  "root": true,
+  "rules": {
+    "no-restricted-imports": ["error", {
+      "paths": [{
+        "name": "@/lib/api",
+        "message": "Import from '@/lib/api' is disallowed. Use '@/lib/useApi' instead to ensure unified error handling."
+      }]
+    }]
+  }
+}

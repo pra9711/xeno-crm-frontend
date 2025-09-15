@@ -1,22 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f3f7ff; /* slightly bluer page background */
   --foreground: #171717;
+  /* Strong purple for primary branding */
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --primary-glow: #a855f7; /* hex fallback */
+  --primary-glow-rgb: 255 123 255; /* numeric RGB for glow utilities if needed */
 }
 
-@theme inline {
+/* Theme tokens (keep in :root for CSS variables) */
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -24,3 +25,35 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Theme tokens are handled via classes and tokenized CSS; avoid forcing preferences here. */
+
+.animate-float {
+  animation: float 9s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.shadow-glow {
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25), 0 2px 6px rgba(139, 92, 246, 0.15);
+}
+
+.shadow-elegant {
+  box-shadow: 0 14px 40px rgba(139, 92, 246, 0.2), 0 6px 18px rgba(139, 92, 246, 0.12);
+}
+
+.font-display { font-family: Georgia, 'Times New Roman', serif; }
+
+.backdrop-blur-sm { backdrop-filter: blur(6px); }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up { animation: fadeInUp 1s ease both; }
+
