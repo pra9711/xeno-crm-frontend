@@ -9,32 +9,60 @@ export class AuthService {
   // Subscribers to logout/token removal events
   private logoutSubscribers: Set<() => void> = new Set()
 
-  // Get the stored auth token from cookies only
+  // Get the stored auth token from localStorage (production) or cookies (development)
   getToken(): string | null {
     if (typeof window === 'undefined') return null
+    
+    // For production (cross-domain), use localStorage
+    if (process.env.NODE_ENV === 'production') {
+      return localStorage.getItem(this.tokenKey) || null
+    }
+    
+    // For development (same-domain), use cookies
     return Cookies.get(this.tokenKey) || null
   }
 
   // Store the auth token
   setToken(token: string): void {
-    Cookies.set(this.tokenKey, token, { 
-      expires: 7, // 7 days
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    })
+    if (typeof window === 'undefined') return
+    
+    // For production (cross-domain), use localStorage
+    if (process.env.NODE_ENV === 'production') {
+      localStorage.setItem(this.tokenKey, token)
+    } else {
+      // For development (same-domain), use cookies
+      Cookies.set(this.tokenKey, token, { 
+        expires: 7, // 7 days
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+      })
+    }
   }
 
   // Remove the auth token
   removeToken(): void {
-  // Ensure path matches server-side cookie so removal succeeds
-  Cookies.remove(this.tokenKey, { path: '/' })
-  // Notify subscribers that token was removed
-  try {
-    for (const fn of Array.from(this.logoutSubscribers)) {
-      try { fn() } catch { /* ignore subscriber errors */ }
+    if (typeof window === 'undefined') return
+    
+    // For production (cross-domain), remove from localStorage
+    if (process.env.NODE_ENV === 'production') {
+      localStorage.removeItem(this.tokenKey)
+    } else {
+      // For development (same-domain), remove from cookies
+      Cookies.remove(this.tokenKey, { path: '/' })
     }
-  } catch { /* ignore */ }
+    
+    // Notify subscribers that token was removed
+    try {
+      for (const fn of Array.from(this.logoutSubscribers)) {
+        try { fn() } catch { /* ignore subscriber errors */ }
+      }
+    } catch { /* ignore */ }
+  }
+
+  // Login with token (for use after OAuth callback)
+  login(token: string): void {
+    this.setToken(token)
   }
 
   // Check if user is authenticated

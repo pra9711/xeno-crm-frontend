@@ -18,14 +18,21 @@ export function setApiBaseUrl(url: string) {
   api.defaults.baseURL = API_URL
 }
 
-// Request interceptor to add auth token (cookie key: 'auth_token')
+// Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    // httpOnly cookie will be sent automatically because withCredentials is true.
-    // Keep the header logic for environments where cookie isn't used.
     let token: string | undefined | null = undefined
     try {
-      if (typeof window !== 'undefined') token = Cookies.get('auth_token')
+      if (typeof window !== 'undefined') {
+        // For production (cross-domain), read from localStorage
+        if (process.env.NODE_ENV === 'production') {
+          token = localStorage.getItem('auth_token')
+        } else {
+          // For development (same-domain), read from cookies
+          // httpOnly cookie will be sent automatically because withCredentials is true.
+          token = Cookies.get('auth_token')
+        }
+      }
     } catch (err) {
       token = undefined
     }
@@ -40,8 +47,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token
-      Cookies.remove('auth_token');
+      // Clear token from both localStorage and cookies
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token')
+        Cookies.remove('auth_token')
+      }
       // Don't perform client-side redirects here; let callers decide how to surface the unauthenticated state.
     }
     return Promise.reject(error);

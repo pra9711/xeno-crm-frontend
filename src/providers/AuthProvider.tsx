@@ -10,6 +10,7 @@ interface AuthContextValue {
   loading: boolean
   refresh: () => Promise<User | null>
   logout: () => Promise<void>
+  login: (token: string) => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -92,8 +93,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // to ensure UI updates before the navigation occurs.
   }
 
+  const login = (token: string) => {
+    authService.login(token)
+    // Set flag to show welcome toast after the next refresh
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('xeno:show_welcome_toast', '1')
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, refresh, logout }}>
+    <AuthContext.Provider value={{ user, loading, refresh, logout, login }}>
       {children}
     </AuthContext.Provider>
   )

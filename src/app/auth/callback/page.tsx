@@ -19,6 +19,7 @@ export default function AuthCallback() {
       try {
         const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
         const error = params ? params.get('error') : null
+        const token = params ? params.get('token') : null
 
         if (error) {
           setStatus('error')
@@ -26,8 +27,35 @@ export default function AuthCallback() {
           return
         }
 
-        // The backend sets an httpOnly cookie on successful OAuth. 
-        // Refresh the auth context to get the current user session.
+        // For production (cross-domain), token is passed in URL
+        // For development (same-domain), backend sets httpOnly cookie
+        if (token) {
+          // Store the token in localStorage for cross-domain auth
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('auth_token', token)
+          }
+          // Refresh the auth context to get the current user session
+          await refresh()
+          setStatus('success')
+          setMessage('Authentication successful!')
+          
+          // Redirect to dashboard after a brief success message
+          setTimeout(() => {
+            router.push('/dashboard')
+          }, 1000)
+        } else {
+          // Fallback to cookie-based auth (development)
+          // The backend sets an httpOnly cookie on successful OAuth. 
+          // Refresh the auth context to get the current user session.
+          await refresh()
+          setStatus('success')
+          setMessage('Authentication successful!')
+          
+          // Redirect to dashboard after a brief success message
+          setTimeout(() => {
+            router.push('/dashboard')
+          }, 1000)
+        }
         const user = await refresh()
         if (user) {
           setStatus('success')

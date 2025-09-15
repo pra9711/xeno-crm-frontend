@@ -8,14 +8,26 @@ export default function PopupComplete() {
     // Leaves origin loose in development to tolerate cross-origin popup flows.
     const params = new URLSearchParams(window.location.search)
     const status = params.get('status') || 'success'
+    const token = params.get('token')
     const opener = window.opener
+    
     if (opener && !opener.closed) {
       const targetOrigin = process.env.NODE_ENV === 'production' ? window.location.origin : '*'
       try {
-        opener.postMessage({ type: 'oauth-popup', status }, targetOrigin)
+        opener.postMessage({ 
+          type: 'oauth-popup', 
+          status, 
+          token: token || undefined 
+        }, targetOrigin)
       } catch {
         // best-effort fallback
-        try { opener.postMessage({ type: 'oauth-popup', status }, '*') } catch { /* ignore */ }
+        try { 
+          opener.postMessage({ 
+            type: 'oauth-popup', 
+            status, 
+            token: token || undefined 
+          }, '*') 
+        } catch { /* ignore */ }
       }
       try { window.close() } catch { /* ignore */ }
     }

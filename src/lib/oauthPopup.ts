@@ -33,11 +33,22 @@ export function openOAuthPopup(): Promise<OAuthPopupResult> {
         const payload = (_e as MessageEvent).data
         if (!payload || payload.type !== 'oauth-popup') return
         window.removeEventListener('message', handleMessage)
+        
         try {
+          // Check if we received a token (production cross-domain)
+          if (payload.token) {
+            // Store the token for cross-domain auth
+            if (typeof window !== 'undefined') {
+              if (process.env.NODE_ENV === 'production') {
+                localStorage.setItem('auth_token', payload.token)
+              }
+            }
+          }
+          
           // Call /api/auth/me to refresh session
           const me = await apiRequest({ method: 'get', url: '/auth/me' })
-          const payload = me.data as Record<string, unknown> | undefined
-          if (me.ok && payload?.['success'] === true) {
+          const payloadData = me.data as Record<string, unknown> | undefined
+          if (me.ok && payloadData?.['success'] === true) {
             resolve({ status: 'success' })
           } else {
             resolve({ status: 'error', message: me.error || 'Failed to refresh session' })
