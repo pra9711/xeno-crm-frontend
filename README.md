@@ -84,7 +84,7 @@ Follow these steps to get the frontend application running on your local machine
 ### 1. Clone the Repository
 
 ```bash
-git clone 
+git clone https://github.com/pra9711/xeno-crm-frontend
 cd xeno-crm-frontend
 ```
 
