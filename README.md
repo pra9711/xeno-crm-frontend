@@ -98,17 +98,15 @@ Create a .env.local file in the root of the project.
 Now, fill in the .env.local file. At a minimum, you must specify the backend API URL.
 
 ```bash
-
-# The base URL for your running backend instance
 NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
+NEXT_PUBLIC_APP_NAME=Xeno CRM
+NEXT_PUBLIC_APP_VERSION=1.0.0
+NEXT_PUBLIC_BACKEND_DEV_TOKEN_FALLBACK=false
+NEXT_PUBLIC_VENDOR_API_URL=http://localhost:3001/api/vendor
+NEXT_PUBLIC_VENDOR_API_KEY=dummy-vendor-api-key
+NEXT_PUBLIC_USE_MOCKS=true
 
-# (Optional) Set to 'true' to use mocked data for the AI Insights page.
-# This is useful for developing the UI without a running backend.
-NEXT_PUBLIC_USE_MOCKS=false
-
-# (Optional) Set to 'true' to use the unauthenticated AI endpoint for
-# converting natural language to rules. Useful for testing this specific feature.
-NEXT_PUBLIC_ENABLE_PUBLIC_AI_ROUTE=false
 ```
 
 ### 4. Run the Development Server
