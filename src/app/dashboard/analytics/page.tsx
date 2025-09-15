@@ -11,6 +11,7 @@ import {
 } from 'recharts'
 import useApi from '@/lib/useApi'
 import type { DashboardAnalytics } from '@/types'
+import { OrderStatus, CampaignStatus } from '@/types'
 
 interface AnalyticsData {
   dashboard: DashboardAnalytics
@@ -66,37 +67,137 @@ export default function AnalyticsPage() {
           const mockAnalytics: AnalyticsData = {
             dashboard: {
               summary: {
-                totalCustomers: 1245, newCustomers: 123, totalOrders: 3456,
-                totalRevenue: 125000, activeCampaigns: 8, avgOrderValue: 36.15
+                totalCustomers: 2847, 
+                newCustomers: 234, 
+                totalOrders: 6789,
+                totalRevenue: 287500, 
+                activeCampaigns: 12, 
+                avgOrderValue: 42.35
               },
               campaignStats: {
-                totalCampaigns: 25, totalMessages: 45000, deliveredMessages: 42750, deliveryRate: 0.95
+                totalCampaigns: 45, 
+                totalMessages: 125000, 
+                deliveredMessages: 118750, 
+                deliveryRate: 0.95
               },
-              topCustomers: [],
-              recentActivity: { orders: [], campaigns: [] },
+              topCustomers: [
+                { 
+                  id: '1', 
+                  name: 'Sarah Johnson', 
+                  email: 'sarah@techcorp.com', 
+                  totalSpending: 2400,
+                  visitCount: 12,
+                  createdAt: '2024-01-15T00:00:00Z',
+                  updatedAt: '2024-12-01T00:00:00Z'
+                },
+                { 
+                  id: '2', 
+                  name: 'Michael Chen', 
+                  email: 'mchen@innovate.io', 
+                  totalSpending: 1850,
+                  visitCount: 8,
+                  createdAt: '2024-02-20T00:00:00Z',
+                  updatedAt: '2024-11-28T00:00:00Z'
+                },
+                { 
+                  id: '3', 
+                  name: 'Emma Rodriguez', 
+                  email: 'emma@designstudio.com', 
+                  totalSpending: 1620,
+                  visitCount: 15,
+                  createdAt: '2024-01-30T00:00:00Z',
+                  updatedAt: '2024-11-30T00:00:00Z'
+                }
+              ],
+              recentActivity: { 
+                orders: [
+                  { 
+                    id: '1', 
+                    customerId: 'cust1',
+                    customer: {
+                      id: 'cust1',
+                      name: 'John Doe',
+                      email: 'john@example.com',
+                      totalSpending: 500,
+                      createdAt: '2024-10-01T00:00:00Z',
+                      updatedAt: '2024-12-01T00:00:00Z'
+                    },
+                    items: [{ productName: 'Premium Service', quantity: 1, price: 159.99 }],
+                    total: 159.99, 
+                    status: OrderStatus.COMPLETED,
+                    createdAt: '2024-12-01T10:00:00Z',
+                    updatedAt: '2024-12-01T15:00:00Z'
+                  },
+                  { 
+                    id: '2', 
+                    customerId: 'cust2',
+                    customer: {
+                      id: 'cust2',
+                      name: 'Jane Smith',
+                      email: 'jane@example.com',
+                      totalSpending: 800,
+                      createdAt: '2024-09-15T00:00:00Z',
+                      updatedAt: '2024-12-01T00:00:00Z'
+                    },
+                    items: [{ productName: 'Enterprise Package', quantity: 1, price: 299.99 }],
+                    total: 299.99, 
+                    status: OrderStatus.PROCESSING,
+                    createdAt: '2024-12-01T14:00:00Z',
+                    updatedAt: '2024-12-01T14:30:00Z'
+                  }
+                ], 
+                campaigns: [
+                  { 
+                    id: '1', 
+                    name: 'Black Friday Sale', 
+                    status: CampaignStatus.ACTIVE, 
+                    userId: 'user1',
+                    rules: { logic: 'AND', conditions: [] },
+                    audienceSize: 5000,
+                    createdAt: '2024-11-20T00:00:00Z',
+                    updatedAt: '2024-12-01T00:00:00Z'
+                  },
+                  { 
+                    id: '2', 
+                    name: 'Product Launch', 
+                    status: CampaignStatus.COMPLETED, 
+                    userId: 'user1',
+                    rules: { logic: 'AND', conditions: [] },
+                    audienceSize: 3200,
+                    createdAt: '2024-11-10T00:00:00Z',
+                    updatedAt: '2024-11-25T00:00:00Z'
+                  }
+                ] 
+              },
               timeframe: timeRange
             },
             customerGrowth: [
-              { month: 'Jan', customers: 800, revenue: 85000 },
-              { month: 'Feb', customers: 950, revenue: 92000 },
-              { month: 'Mar', customers: 1100, revenue: 105000 },
-              { month: 'Apr', customers: 1245, revenue: 125000 },
-              { month: 'May', customers: 1380, revenue: 140000 },
-              { month: 'Jun', customers: 1520, revenue: 155000 }
+              { month: 'Jul', customers: 1450, revenue: 125000 },
+              { month: 'Aug', customers: 1680, revenue: 142000 },
+              { month: 'Sep', customers: 1920, revenue: 168000 },
+              { month: 'Oct', customers: 2180, revenue: 195000 },
+              { month: 'Nov', customers: 2450, revenue: 235000 },
+              { month: 'Dec', customers: 2847, revenue: 287500 }
             ],
             campaignPerformance: [
-              { name: 'Welcome Series', sent: 1250, delivered: 1188, failed: 62 },
-              { name: 'Summer Sale', sent: 3400, delivered: 3230, failed: 170 },
-              { name: 'Product Launch', sent: 2100, delivered: 1995, failed: 105 }
+              { name: 'Black Friday Sale', sent: 8500, delivered: 8075, failed: 425 },
+              { name: 'Welcome Series', sent: 3200, delivered: 3040, failed: 160 },
+              { name: 'Product Launch', sent: 6800, delivered: 6460, failed: 340 },
+              { name: 'Customer Retention', sent: 4200, delivered: 3990, failed: 210 },
+              { name: 'Holiday Special', sent: 7500, delivered: 7125, failed: 375 }
             ],
             orderStatus: [
-              { name: 'Completed', value: 2145, color: '#10B981' },
-              { name: 'Processing', value: 567, color: '#3B82F6' },
-              { name: 'Pending', value: 234, color: '#F59E0B' }
+              { name: 'Completed', value: 4234, color: '#10B981' },
+              { name: 'Processing', value: 1456, color: '#3B82F6' },
+              { name: 'Pending', value: 876, color: '#F59E0B' },
+              { name: 'Cancelled', value: 223, color: '#EF4444' }
             ],
             topProducts: [
-              { name: 'Premium Package', orders: 345, revenue: 34500 },
-              { name: 'Standard Plan', orders: 567, revenue: 28350 }
+              { name: 'Enterprise Package', orders: 456, revenue: 91200 },
+              { name: 'Premium Plan', orders: 789, revenue: 78900 },
+              { name: 'Starter Package', orders: 1234, revenue: 61700 },
+              { name: 'Add-on Services', orders: 345, revenue: 17250 },
+              { name: 'Consulting Hours', orders: 567, revenue: 85050 }
             ]
           }
           if (isMounted) setAnalytics(mockAnalytics)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import {
   MagnifyingGlassIcon,
@@ -49,7 +49,9 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: Re
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchLoading, setSearchLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [sortBy, setSortBy] = useState<'createdAt' | 'total' | 'customer'>('createdAt')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -65,6 +67,75 @@ export default function OrdersPage() {
   // Tests enable this flag via `test/jest.setup.ts`.
   const useMocks = process.env.NEXT_PUBLIC_USE_MOCKS === 'true'
 
+  // Debounce search term to avoid API calls on every keystroke
+  useEffect(() => {
+    if (searchTerm !== debouncedSearchTerm) {
+      setSearchLoading(true)
+    }
+    
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+      setSearchLoading(false)
+    }, 500) // 500ms delay
+
+    return () => clearTimeout(timer)
+  }, [searchTerm, debouncedSearchTerm])
+
+  // Filter orders locally if we have mock data
+  const filteredOrders = useMemo(() => {
+    if (!useMocks) return orders
+    
+    let filtered = [...orders]
+    
+    // Apply search filter
+    if (debouncedSearchTerm) {
+      const searchLower = debouncedSearchTerm.toLowerCase()
+      filtered = filtered.filter(order => 
+        order.customer?.name?.toLowerCase().includes(searchLower) ||
+        order.customer?.email?.toLowerCase().includes(searchLower) ||
+        order.id.toLowerCase().includes(searchLower)
+      )
+    }
+    
+    // Apply status filter
+    if (statusFilter) {
+      filtered = filtered.filter(order => order.status === statusFilter)
+    }
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue: any, bValue: any
+      
+      switch (sortBy) {
+        case 'total':
+          aValue = a.total
+          bValue = b.total
+          break
+        case 'customer':
+          aValue = a.customer?.name || ''
+          bValue = b.customer?.name || ''
+          break
+        case 'createdAt':
+        default:
+          aValue = new Date(a.createdAt)
+          bValue = new Date(b.createdAt)
+          break
+      }
+      
+      if (typeof aValue === 'string') {
+        return sortOrder === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      }
+      
+      return sortOrder === 'asc' 
+        ? (aValue < bValue ? -1 : aValue > bValue ? 1 : 0)
+        : (bValue < aValue ? -1 : bValue > aValue ? 1 : 0)
+    })
+    
+    return filtered
+  }, [orders, debouncedSearchTerm, statusFilter, sortBy, sortOrder, useMocks])
+
   const fetchOrders = async (overridePage?: number) => {
     try {
       setLoading(true)
@@ -74,7 +145,7 @@ export default function OrdersPage() {
         limit: pagination.limit.toString(),
         sortBy,
         sortOrder,
-        ...(searchTerm && { search: searchTerm }),
+        ...(debouncedSearchTerm && { search: debouncedSearchTerm }),
         ...(statusFilter && { status: statusFilter }),
       })
       const response = await apiClient.request<unknown>({ method: 'get', url: `/orders?${params}` })
@@ -198,7 +269,7 @@ export default function OrdersPage() {
   useEffect(() => {
     fetchOrders()
     // eslint-disable-next-line
-  }, [pagination.page, searchTerm, statusFilter, sortBy, sortOrder])
+  }, [pagination.page, debouncedSearchTerm, statusFilter, sortBy, sortOrder])
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
@@ -291,14 +362,28 @@ export default function OrdersPage() {
             <input
               type="text"
               placeholder="Search by customer, email, or order ID"
-              className="w-full rounded-full pl-10 pr-4 py-2 bg-slate-50 border border-blue-100 focus:border-blue-400 text-base"
+              className="w-full rounded-full pl-10 pr-10 py-2 bg-slate-50 border border-blue-100 focus:border-blue-400 text-base"
               value={searchTerm}
-              onChange={(e) => { setSearchTerm(e.target.value); setPagination(prev => ({ ...prev, page: 1 })) }}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+                // Reset to page 1 when search term changes
+                if (e.target.value !== searchTerm) {
+                  setPagination(prev => ({ ...prev, page: 1 }))
+                }
+              }}
             />
+            {searchLoading && (
+              <div className="absolute right-3 top-2.5">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
+              </div>
+            )}
           </div>
           <select
             value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
+            onChange={e => {
+              setStatusFilter(e.target.value)
+              setPagination(prev => ({ ...prev, page: 1 }))
+            }}
             className="rounded-xl bg-white border border-gray-200 focus:border-gray-300 px-4 py-2 text-base text-black shadow-sm"
           >
             <option value="">All Statuses</option>
@@ -313,6 +398,7 @@ export default function OrdersPage() {
               const [field, order] = e.target.value.split('-')
               setSortBy(field as typeof sortBy)
               setSortOrder(order as typeof sortOrder)
+              setPagination(prev => ({ ...prev, page: 1 }))
             }}
             className="rounded-xl bg-white border border-gray-200 focus:border-gray-300 px-4 py-2 text-base text-black shadow-sm"
           >
@@ -358,7 +444,7 @@ export default function OrdersPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
-                  {orders.map((order) => {
+                  {(useMocks ? filteredOrders : orders).map((order) => {
                     const status = statusConfig[order.status]
                     return (
                       <tr key={order.id} className="hover:bg-gray-50 text-sm">
@@ -423,6 +509,27 @@ export default function OrdersPage() {
                       </tr>
                     )
                   })}
+                  {(useMocks ? filteredOrders : orders).length === 0 && !loading && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                        {debouncedSearchTerm || statusFilter ? (
+                          <div>
+                            <div className="text-lg font-medium mb-2">No orders found</div>
+                            <div className="text-sm">
+                              Try adjusting your search terms or filters
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="text-lg font-medium mb-2">No orders yet</div>
+                            <div className="text-sm">
+                              Orders will appear here once customers start placing them
+                            </div>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

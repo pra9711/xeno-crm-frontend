@@ -18,7 +18,7 @@ import { inputFocusBorder, inputFocusRing, statGradients, orbGradients, featureG
 
 export default function LoginPage() {
 	const router = useRouter();
-	const { user, loading } = useAuth();
+	const { user, loading, login, refresh } = useAuth();
 
   const { show } = useToast()
 
@@ -48,16 +48,44 @@ export default function LoginPage() {
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
-		setTimeout(() => {
+
+		try {
+			// Use demo credentials if in demo mode
 			if (useMocks && email === "demo@xeno.com" && password === "demo123") {
 				try { if (typeof window !== 'undefined') sessionStorage.setItem('xeno:show_welcome_toast', '1') } catch (e) {}
 				show({ message: 'Login Successful!' })
 				router.push("/dashboard");
-			} else {
-				show({ message: 'Invalid credentials' })
+				return;
 			}
+
+			// Real authentication
+			const result = await authService.loginWithEmail(email, password);
+			
+			if (result.success && result.user) {
+				show({ message: 'Login successful!' });
+				
+				// Call AuthProvider login to update context state and refresh immediately
+				const token = authService.getToken();
+				if (token) {
+					login(token);
+					// Trigger refresh to update user state immediately
+					try {
+						await refresh();
+					} catch (refreshError) {
+						console.error('Auth refresh failed:', refreshError);
+					}
+				}
+				
+				router.push("/dashboard");
+			} else {
+				show({ message: result.error || 'Invalid credentials' });
+			}
+		} catch (error) {
+			console.error('Login error:', error);
+			show({ message: 'Login failed. Please try again.' });
+		} finally {
 			setIsLoading(false);
-		}, 1500);
+		}
 	};
 
 	const handleGoogleLogin = () => {

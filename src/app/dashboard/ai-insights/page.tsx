@@ -121,25 +121,151 @@ export default function AIInsightsPage() {
         } else {
           // Keep a small, predictable mock for local dev when backend isn't reachable
           const mockInsights: AIInsight[] = [
-            { id: '1', type: 'opportunity', title: 'High-Value Customer Segment Identified', description: 'A group of 45 customers shows 80% higher lifetime value potential. Consider creating a premium tier.', impact: 'high', actionable: true, category: 'customer', createdAt: '2024-01-22T10:00:00Z' },
-            { id: '2', type: 'warning', title: 'Campaign Fatigue Detected', description: 'Email open rates have declined 15% in the last 30 days. Reduce frequency or diversify content.', impact: 'medium', actionable: true, category: 'campaign', createdAt: '2024-01-22T09:30:00Z' },
-            { id: '3', type: 'trend', title: 'Mobile Engagement Surge', description: 'Mobile interactions increased 45% this quarter. Optimize campaigns for mobile-first experience.', impact: 'high', actionable: true, category: 'campaign', createdAt: '2024-01-22T09:00:00Z' }
+            { 
+              id: '1', 
+              type: 'opportunity', 
+              title: 'High-Value Customer Segment Identified', 
+              description: 'A group of 127 customers shows 85% higher lifetime value potential with average spending $2,400. Consider creating a VIP program to retain and upsell this segment.', 
+              impact: 'high', 
+              actionable: true, 
+              category: 'customer', 
+              createdAt: '2024-12-01T10:00:00Z' 
+            },
+            { 
+              id: '2', 
+              type: 'warning', 
+              title: 'Campaign Fatigue Detected in Premium Segment', 
+              description: 'Email open rates have declined 23% in premium customers over the last 21 days. Engagement scores down 18%. Recommend reducing frequency or implementing AI-driven content personalization.', 
+              impact: 'high', 
+              actionable: true, 
+              category: 'campaign', 
+              createdAt: '2024-12-01T09:30:00Z' 
+            },
+            { 
+              id: '3', 
+              type: 'trend', 
+              title: 'Mobile-First Customer Behavior Shift', 
+              description: 'Mobile interactions increased 67% this quarter, now representing 78% of all engagements. Mobile conversion rate is 34% higher than desktop. Prioritize mobile-optimized campaigns.', 
+              impact: 'high', 
+              actionable: true, 
+              category: 'campaign', 
+              createdAt: '2024-12-01T09:00:00Z' 
+            },
+            { 
+              id: '4', 
+              type: 'recommendation', 
+              title: 'AI-Powered Personalization Opportunity', 
+              description: 'Customers who receive personalized product recommendations show 156% higher conversion rates and 89% higher AOV. Implement AI-driven product suggestion engine for remaining 62% of customer base.', 
+              impact: 'high', 
+              actionable: true, 
+              category: 'optimization', 
+              createdAt: '2024-12-01T08:45:00Z' 
+            },
+            { 
+              id: '5', 
+              type: 'warning', 
+              title: 'Churn Risk Spike in Q4 Cohort', 
+              description: 'Machine learning models predict 23% of Q4 acquired customers at high churn risk (confidence: 89%). Primary factors: low initial engagement and delayed first purchase.', 
+              impact: 'medium', 
+              actionable: true, 
+              category: 'retention', 
+              createdAt: '2024-12-01T08:30:00Z' 
+            },
+            { 
+              id: '6', 
+              type: 'opportunity', 
+              title: 'Cross-Sell Revenue Potential Identified', 
+              description: 'Analysis reveals $156K untapped cross-sell revenue from 342 customers who purchased Category A but not complementary Category B products. Conversion probability: 73%.', 
+              impact: 'medium', 
+              actionable: true, 
+              category: 'revenue', 
+              createdAt: '2024-12-01T08:15:00Z' 
+            },
+            { 
+              id: '7', 
+              type: 'trend', 
+              title: 'Weekend Engagement Surge', 
+              description: 'Unexpected 45% increase in weekend engagement rates. Saturday campaigns show 28% higher open rates and 41% higher click-through rates compared to weekday averages.', 
+              impact: 'medium', 
+              actionable: true, 
+              category: 'timing', 
+              createdAt: '2024-12-01T08:00:00Z' 
+            },
+            { 
+              id: '8', 
+              type: 'recommendation', 
+              title: 'Dynamic Pricing Optimization', 
+              description: 'Price sensitivity analysis suggests 12-18% revenue increase potential through dynamic pricing for 67% of product catalog. Customers show varying price elasticity by segment and time.', 
+              impact: 'high', 
+              actionable: true, 
+              category: 'pricing', 
+              createdAt: '2024-12-01T07:45:00Z' 
+            }
           ]
           const mockCustomerScores: CustomerScore[] = [
-            { customerId: '1', customerName: 'John Doe', score: 85, factors: { engagement: 90, spending: 85, frequency: 80, recency: 85 }, risk: 'low', recommendations: ['Upsell premium services', 'Invite to loyalty program'] },
-            { customerId: '2', customerName: 'Jane Smith', score: 45, factors: { engagement: 40, spending: 60, frequency: 30, recency: 50 }, risk: 'high', recommendations: ['Send re-engagement campaign', 'Offer discount incentive'] }
+            { 
+              customerId: '1', 
+              customerName: 'Sarah Johnson', 
+              score: 92, 
+              factors: { engagement: 95, spending: 88, frequency: 92, recency: 94 }, 
+              risk: 'low', 
+              recommendations: ['Invite to VIP program', 'Offer premium consulting services', 'Early access to new features'] 
+            },
+            { 
+              customerId: '2', 
+              customerName: 'Michael Chen', 
+              score: 87, 
+              factors: { engagement: 91, spending: 85, frequency: 89, recency: 83 }, 
+              risk: 'low', 
+              recommendations: ['Upsell enterprise package', 'Cross-sell complementary services', 'Referral program invitation'] 
+            },
+            { 
+              customerId: '3', 
+              customerName: 'Emma Rodriguez', 
+              score: 76, 
+              factors: { engagement: 82, spending: 74, frequency: 71, recency: 78 }, 
+              risk: 'low', 
+              recommendations: ['Increase engagement with personalized content', 'Loyalty program enrollment', 'Product usage optimization tips'] 
+            },
+            { 
+              customerId: '4', 
+              customerName: 'David Kim', 
+              score: 58, 
+              factors: { engagement: 65, spending: 72, frequency: 45, recency: 51 }, 
+              risk: 'medium', 
+              recommendations: ['Re-engagement campaign with special offer', 'Personal check-in from account manager', 'Product training session'] 
+            },
+            { 
+              customerId: '5', 
+              customerName: 'Lisa Anderson', 
+              score: 34, 
+              factors: { engagement: 28, spending: 45, frequency: 31, recency: 32 }, 
+              risk: 'high', 
+              recommendations: ['Immediate intervention required', 'Win-back campaign with significant discount', 'Direct outreach from customer success'] 
+            },
+            { 
+              customerId: '6', 
+              customerName: 'James Wilson', 
+              score: 41, 
+              factors: { engagement: 38, spending: 55, frequency: 35, recency: 37 }, 
+              risk: 'high', 
+              recommendations: ['Survey for feedback and pain points', 'Offer alternative product configuration', 'Schedule strategic account review'] 
+            }
           ]
           const mockPredictive: PredictiveAnalytics = {
-            churnPrediction: { highRisk: 12, mediumRisk: 28, lowRisk: 160 },
+            churnPrediction: { highRisk: 89, mediumRisk: 156, lowRisk: 2567 },
             revenueForecasts: [
-              { month: 'Feb', predicted: 145000, confidence: 85 },
-              { month: 'Mar', predicted: 152000, confidence: 82 },
-              { month: 'Apr', predicted: 158000, confidence: 79 }
+              { month: 'Jan 2025', predicted: 298000, confidence: 91 },
+              { month: 'Feb 2025', predicted: 312000, confidence: 87 },
+              { month: 'Mar 2025', predicted: 334000, confidence: 83 },
+              { month: 'Apr 2025', predicted: 347000, confidence: 79 },
+              { month: 'May 2025', predicted: 365000, confidence: 75 },
+              { month: 'Jun 2025', predicted: 382000, confidence: 71 }
             ],
             campaignOptimization: {
-              bestTimes: ['Tuesday 2PM', 'Thursday 10AM'],
-              optimalFrequency: 2.5,
-              topPerformingChannels: ['Email', 'SMS']
+              bestTimes: ['Tuesday 2:00 PM EST', 'Thursday 10:30 AM EST', 'Saturday 11:00 AM EST'],
+              optimalFrequency: 2.3,
+              topPerformingChannels: ['Email (94.2% delivery)', 'SMS (89.7% delivery)', 'Push (76.3% delivery)']
             }
           }
 

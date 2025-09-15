@@ -102,6 +102,90 @@ export class AuthService {
     }
   }
 
+  // Login with email and password
+  async loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
+    try {
+      const response = await apiRequest<ApiResponse<User & { token?: string }>>({
+        method: 'post',
+        url: '/auth/login',
+        data: { email, password }
+      })
+
+      if (response.ok && response.data?.success && response.data.data) {
+        const userData = response.data.data
+        
+        // If we received a token (production), store it
+        if (userData.token) {
+          this.setToken(userData.token)
+        }
+        
+        // Set flag to show welcome toast
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('xeno:show_welcome_toast', '1')
+        }
+
+        return { 
+          success: true, 
+          user: {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar,
+            createdAt: userData.createdAt,
+            googleId: userData.googleId
+          }
+        }
+      } else {
+        return { success: false, error: response.data?.error || response.error || 'Login failed' }
+      }
+    } catch (error: unknown) {
+      logError('Login error:', error)
+      return { success: false, error: 'Login failed due to network error' }
+    }
+  }
+
+  // Register with email, name and password
+  async registerWithEmail(email: string, name: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
+    try {
+      const response = await apiRequest<ApiResponse<User & { token?: string }>>({
+        method: 'post',
+        url: '/auth/register',
+        data: { email, name, password }
+      })
+
+      if (response.ok && response.data?.success && response.data.data) {
+        const userData = response.data.data
+        
+        // If we received a token (production), store it
+        if (userData.token) {
+          this.setToken(userData.token)
+        }
+        
+        // Set flag to show welcome toast
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('xeno:show_welcome_toast', '1')
+        }
+
+        return { 
+          success: true, 
+          user: {
+            id: userData.id,
+            email: userData.email,
+            name: userData.name,
+            avatar: userData.avatar || '',
+            createdAt: userData.createdAt,
+            googleId: userData.googleId
+          }
+        }
+      } else {
+        return { success: false, error: response.data?.error || response.error || 'Registration failed' }
+      }
+    } catch (error: unknown) {
+      logError('Registration error:', error)
+      return { success: false, error: 'Registration failed due to network error' }
+    }
+  }
+
   // Login with Google (redirect to backend)
   loginWithGoogle(): void {
     const apiBase = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api').replace(/\/$/, '')
