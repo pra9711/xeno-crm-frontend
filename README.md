@@ -65,9 +65,9 @@ The UI is styled with **Tailwind CSS** for a responsive, utility-first design an
 
 ## 🏗️ Architecture Diagram
 
-*(This section is reserved for the architecture diagram. I will add it here later.)*
-
 <br/>
+<img width="3840" height="2390" alt="Untitled diagram _ Mermaid Chart-2025-09-15-191632" src="https://github.com/user-attachments/assets/462a9d20-c434-447c-9007-992f6c2dd082" />
+
 <br/>
 
 ---
